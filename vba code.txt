@@ -1,0 +1,96 @@
+Sub test()
+
+Dim xRg As Range
+Dim xRgUni As Range
+Dim xFirstAddress As String
+Dim xStr As String
+On Error Resume Next
+Alert = False
+Dim MissingColumn As String
+
+
+' ¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­
+'               section 1
+' ¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­
+Worksheets("checking").Activate
+LastColumns = ActiveSheet.Cells.Find("*", SearchOrder:=xlByRows, SearchDirection:=xlPrevious).Column
+lastRow = ActiveSheet.Cells.Find("*", SearchOrder:=xlByRows, SearchDirection:=xlPrevious).Row
+
+For i = 1 To LastColumns
+    Worksheets("checking").Activate
+    xStr = Cells(1, i).Value
+    Worksheets("dataset 1").Activate
+    Set xRg = Range("1:1").Find(xStr, , xlValues, xlWhole, , , True)
+    
+    If Not xRg Is Nothing Then
+        xFirstAddress = xRg.Address
+        Do
+            Set xRg = Range("1:1").FindNext(xRg)
+            If xRgUni Is Nothing Then
+                Set xRgUni = xRg
+            Else
+                Set xRgUni = Application.Union(xRgUni, xRg)
+            End If
+        Loop While (Not xRg Is Nothing) And (xRg.Address <> xFirstAddress)
+    Else
+    Alert = True
+    MissingColumn = MissingColumn & xStr & " "
+    End If
+    y = xRg.Column
+    x = ActiveSheet.Cells.Find("*", SearchOrder:=xlByRows, SearchDirection:=xlPrevious).Row
+    Range(Cells(2, y), Cells(x, y)).Copy
+    Worksheets("checking").Activate
+    Cells(lastRow + 1, i).PasteSpecial Paste:=xlPasteValues
+    Selection.Interior.ColorIndex = 19
+    Selection.Font.ColorIndex = 1
+Next
+
+
+' ¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­
+'               section 2
+' ¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­
+Worksheets("checking").Activate
+LastColumns = ActiveSheet.Cells.Find("*", SearchOrder:=xlByRows, SearchDirection:=xlPrevious).Column
+lastRow = ActiveSheet.Cells.Find("*", SearchOrder:=xlByRows, SearchDirection:=xlPrevious).Row
+
+For i = 1 To LastColumns
+    Worksheets("checking").Activate
+    xStr = Cells(1, i).Value
+    
+    Worksheets("dataset 2").Activate
+    Set xRg = Range("1:1").Find(xStr, , xlValues, xlWhole, , , True)
+    
+    If Not xRg Is Nothing Then
+        xFirstAddress = xRg.Address
+        Do
+            Set xRg = Range("1:1").FindNext(xRg)
+            If xRgUni Is Nothing Then
+                Set xRgUni = xRg
+            Else
+                Set xRgUni = Application.Union(xRgUni, xRg)
+            End If
+        Loop While (Not xRg Is Nothing) And (xRg.Address <> xFirstAddress)
+    Else
+    Alert = True
+    MissingColumn = MissingColumn & xStr & " "
+    End If
+    y = xRg.Column
+    x = ActiveSheet.Cells.Find("*", SearchOrder:=xlByRows, SearchDirection:=xlPrevious).Row
+    Range(Cells(2, y), Cells(x, y)).Copy 'cell(row, col)
+    Worksheets("checking").Activate
+    Cells(lastRow + 1, i).PasteSpecial Paste:=xlPasteValues
+    Selection.Interior.ColorIndex = 20
+    Selection.Font.ColorIndex = 1
+Next
+
+If Alert = True Then MsgBox "some columns of two tables maybe different. check column name of two tables mannally." & vbCrLf & vbCrLf & "missing columns maybe: " & MissingColumn
+
+
+' ¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­
+'               section 3
+' ¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­¡­
+
+
+End Sub
+
+
